@@ -23,7 +23,7 @@ export function createTikTokPlayer(canvas, { manifest: manifestUrl, onTime, onEr
   }
 
   function loadSheet(index) {
-    if (index >= Math.ceil(manifest.frames / manifest.framesPerSheet)) return null;
+    if (index < 0 || index >= Math.ceil(manifest.frames / manifest.framesPerSheet)) return null;
     if (sheets.has(index)) return sheets.get(index);
     if ((retryAfter.get(index) || 0) > performance.now()) return { image: null, promise: Promise.resolve() };
     const entry = { image: null, promise: null };
@@ -80,7 +80,8 @@ export function createTikTokPlayer(canvas, { manifest: manifestUrl, onTime, onEr
 
   function tick(now) {
     if (paused) return;
-    const nextTime = Math.min(manifest.duration, currentTime + Math.min((now - lastTick) / 1000, .1));
+    const elapsed = Math.max(0, Math.min((now - lastTick) / 1000, .1));
+    const nextTime = Math.min(manifest.duration, currentTime + elapsed);
     lastTick = now;
     const frame = Math.min(manifest.frames - 1, Math.floor(nextTime * manifest.fps));
     // Loading pauses this clock, so the CTA never runs ahead of the actual picture.
