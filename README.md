@@ -26,7 +26,7 @@ Abra **http://localhost:4173**. A apresentação aparece limpa, sem barra de tem
 
 ## No celular
 
-Em telas de celular, a página seleciona automaticamente o vídeo **vertical, 720 × 1280, com uma única formação**. Em pé, ele preenche a janela; ao girar o aparelho, o vídeo vertical é preservado sem cortar a cena. As três frases, seus tempos e a chamada Jogar agora aos 13 s são mantidos. O player continua limpo, sem controles sobrepostos.
+Em telas de celular, a página seleciona automaticamente o vídeo **vertical, 720 × 1280, com uma única formação**. Em pé, ele preenche a janela; ao girar o aparelho, o vídeo vertical é preservado sem cortar a cena. As três frases, seus tempos e a chamada Jogar agora aos 13 s são mantidos. No mobile, o feixe de iluminação fica contido no botão; a iluminação do computador permanece igual. O player continua limpo, sem controles sobrepostos.
 
 No computador, o vídeo horizontal aprovado, com as duas formações, permanece sem alterações.
 
@@ -44,7 +44,7 @@ As capturas são referências para construir geometria tridimensional. Elas não
 - À direita: cinco distritos → portal → prédio, com entrada, ordem de encaixe e giro diferentes.
 - As duas formações se montam simultaneamente e terminam com os prédios completos juntos, por volta de 12,8 segundos.
 - O fundo, a montagem e as frases avançam de forma independente.
-- As frases usam letras 3D arredondadas em Nunito; apenas a chamada final usa letras feitas de cubos.
+- As frases usam letras 3D arredondadas em Nunito; apenas a chamada final usa letras feitas de cubos. A saída das frases limpa letras, sombras e partículas juntas, sem deixar contornos apagados entre as mensagens.
 
 | Tempo | Conteúdo |
 | --- | --- |

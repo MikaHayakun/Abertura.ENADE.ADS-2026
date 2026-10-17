@@ -170,14 +170,17 @@ class BlockPhrases:
         for phrase,glyphs in zip(self.phrases,self.layouts):
             if not phrase.start<=t<=phrase.end:continue
             elapsed=t-phrase.start
+            # Finish the dissolve before the transition ends. A smoothstep has
+            # no long, faint tail; shadows and particles must clear with it.
+            exit_progress=float(np.clip((elapsed-phrase.assembly-phrase.hold)/min(phrase.exit,.16),0,1))
+            outgoing=exit_progress*exit_progress*(3-2*exit_progress)
             unit=2*6*math.tan(math.radians(44 if self.portrait else 38)/2)/self.height
             center_x=self.width*(.5 if self.portrait else .62)
             for i,(kind,x,y,font_scale,color) in enumerate(glyphs):
                 stagger=.065*i/max(1,len(glyphs)-1)
                 incoming=1-ease((elapsed-stagger)/(phrase.assembly-.065))
-                outgoing=ease((elapsed-phrase.assembly-phrase.hold)/phrase.exit)
                 visibility=(1-incoming)*(1-outgoing)
-                if visibility<.003:continue
+                if visibility<(.04 if exit_progress>0 else .003):continue
                 turn=(incoming-outgoing)*.13
                 c,s=math.cos(turn),math.sin(turn)
                 orient=basis@np.array(((c,0,s),(0,1,0),(-s,0,c)))
@@ -185,14 +188,17 @@ class BlockPhrases:
                 position=eye+basis@camera_point
                 scale=unit*font_scale*(.97+.03*visibility)
                 for shadow in (True,False):
+                    alpha=(visibility**3 if exit_progress>0 else visibility)*.72 if shadow else visibility
+                    if alpha<.003:continue
                     m=np.eye(4)
                     m[:3,:3]=orient*scale
                     offset=basis@np.array((1.4*unit,-1.8*unit,-.025)) if shadow else 0
                     m[:3,3]=position+offset
                     ink=(.018,.032,.032) if shadow else color
-                    renderer.items[kind].append([*m.T.reshape(-1),*ink,visibility*(.72 if shadow else 1),0,0,0,0,0,.8])
+                    renderer.items[kind].append([*m.T.reshape(-1),*ink,alpha,0,0,0,0,0,.8])
             # A few small blocks mark the transition, never the letter outlines.
-            activity=max(1-ease(elapsed/phrase.assembly),ease((elapsed-phrase.assembly-phrase.hold)/phrase.exit))
+            exit_activity=math.sin(math.pi*exit_progress)*(1-outgoing) if 1-outgoing>=.04 else 0
+            activity=max(1-ease(elapsed/phrase.assembly),exit_activity)
             if activity>.02:
                 for j in range(32):
                     phase=j*2.39996
