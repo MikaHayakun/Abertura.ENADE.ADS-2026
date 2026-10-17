@@ -1,0 +1,10 @@
+{
+  "width": 720,
+  "height": 1280,
+  "fps": 25,
+  "frames": 380,
+  "columns": 2,
+  "framesPerSheet": 4,
+  "duration": 15.2,
+  "sourceSha256": "6f5988dc1bc49160a21ee8d47867cf817b232d44b2a80a207fc403522efb8c5a"
+}

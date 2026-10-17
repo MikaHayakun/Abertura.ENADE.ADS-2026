@@ -2,5 +2,17 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "buildCommand": null,
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "routes": [
+    {
+      "src": "^/(?:index\\.html)?$",
+      "has": [{
+        "type": "header",
+        "key": "user-agent",
+        "value": ".*(?:iPhone|iPad|iPod|Android|[Mm]obile).*(?:[Tt]ik[Tt]ok|musical_ly|[Tt]rill).*"
+      }],
+      "dest": "/tiktok.html"
+    },
+    { "handle": "filesystem" }
+  ]
 }

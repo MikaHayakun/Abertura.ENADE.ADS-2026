@@ -36,6 +36,12 @@ Para gerar somente a versão mobile:
 python3 scripts/render_opening.py --format portrait --copies 1
 ```
 
+## Navegador interno do TikTok
+
+Somente o TikTok mobile recebe `tiktok.html` por uma regra de User-Agent na Vercel. Essa página desenha no canvas os mesmos 380 quadros do vídeo vertical aprovado (25 fps), sem elemento de vídeo, player nativo ou dependência de permissão de autoplay de mídia. O botão **Jogar agora** segue o tempo dos quadros efetivamente exibidos e permanece após o final. As outras plataformas continuam recebendo o `index.html` original e os mesmos vídeos.
+
+O carregamento mantém até três folhas de quatro quadros decodificadas por vez. O relógio pausa durante carregamento ou quando a página fica em segundo plano. A preferência por movimento reduzido continua respeitada. Para regenerar os quadros após alterar o vídeo mobile, execute `python3 scripts/export_tiktok.py` (requer Pillow e FFmpeg). A prévia isolada está em `/tiktok.html`.
+
 ## Como a animação funciona
 
 As capturas são referências para construir geometria tridimensional. Elas não aparecem como fotos ou painéis dentro da cena.
