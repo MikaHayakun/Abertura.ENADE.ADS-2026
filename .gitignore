@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.py[cod]
+.render-cache/
+.render-deps/
+.vercel/
+.openai/
+.env
+.env.*
+*.tar.gz
+output/frame-*.jpg
+output/storyboard-*.jpg
