@@ -45,6 +45,27 @@ PHRASES=(
     ), center_y=78),
 )
 
+# Same sentences and clocks, reflowed only for the single portrait scene.
+PORTRAIT_PHRASES=(
+    Phrase(.25,.40,4.4,.30,(
+        ('Um jogo educativo',42,'SemiBold',CREAM),
+        ('independente para estudar',39,'SemiBold',CREAM),
+        ('Análise e',50,'ExtraBold',MINT),
+        ('Desenvolvimento',50,'ExtraBold',MINT),
+        ('de Sistemas',50,'ExtraBold',MINT),
+    ), center_y=190),
+    Phrase(5.50,.35,2.8,.28,(
+        ('Acerte os desafios',53,'ExtraBold',CREAM),
+        ('por fases',53,'ExtraBold',CREAM),
+    ), center_y=153),
+    Phrase(9.10,.40,3.0,.30,(
+        ('Reconstrua uma',45,'ExtraBold',CREAM),
+        ('cidade digital',45,'ExtraBold',CREAM),
+        ('enquanto constrói',42,'ExtraBold',CREAM),
+        ('aprendizado real',45,'ExtraBold',CREAM),
+    ), center_y=157),
+)
+
 def ease(value):
     u=float(np.clip(value,0,1))
     return 1-(1-u)**4
@@ -110,9 +131,11 @@ def extrude(contours):
 class BlockPhrases:
     def __init__(self,width=1920,height=1080):
         self.width,self.height=width,height
+        self.portrait=height>width
+        self.phrases=PORTRAIT_PHRASES if self.portrait else PHRASES
         self.fonts={weight:TTFont(FONT_ROOT/f'Nunito-{weight}.ttf') for weight in ('SemiBold','ExtraBold')}
         self.meshes={};self.layouts=[]
-        for phrase in PHRASES:
+        for phrase in self.phrases:
             rows=[];heights=[]
             for text,size,weight,color in phrase.lines:
                 font=ImageFont.truetype(str(FONT_ROOT/f'Nunito-{weight}.ttf'),size)
@@ -144,10 +167,11 @@ class BlockPhrases:
             self.layouts.append(glyphs)
 
     def append(self,renderer,t,eye,basis):
-        for phrase,glyphs in zip(PHRASES,self.layouts):
+        for phrase,glyphs in zip(self.phrases,self.layouts):
             if not phrase.start<=t<=phrase.end:continue
             elapsed=t-phrase.start
-            unit=2*6*math.tan(math.radians(38)/2)/self.height
+            unit=2*6*math.tan(math.radians(44 if self.portrait else 38)/2)/self.height
+            center_x=self.width*(.5 if self.portrait else .62)
             for i,(kind,x,y,font_scale,color) in enumerate(glyphs):
                 stagger=.065*i/max(1,len(glyphs)-1)
                 incoming=1-ease((elapsed-stagger)/(phrase.assembly-.065))
@@ -157,7 +181,7 @@ class BlockPhrases:
                 turn=(incoming-outgoing)*.13
                 c,s=math.cos(turn),math.sin(turn)
                 orient=basis@np.array(((c,0,s),(0,1,0),(-s,0,c)))
-                camera_point=np.array(((x-self.width*.62)*unit,(self.height/2-y-10*incoming+8*outgoing)*unit,-6+.05*(incoming+outgoing)))
+                camera_point=np.array(((x-center_x)*unit,(self.height/2-y-10*incoming+8*outgoing)*unit,-6+.05*(incoming+outgoing)))
                 position=eye+basis@camera_point
                 scale=unit*font_scale*(.97+.03*visibility)
                 for shadow in (True,False):
@@ -172,9 +196,9 @@ class BlockPhrases:
             if activity>.02:
                 for j in range(32):
                     phase=j*2.39996
-                    px=self.width/2+math.sin(phase)*470
+                    px=self.width/2+math.sin(phase)*(self.width*.35 if self.portrait else 470)
                     py=87+math.cos(phase)*55+activity*25
-                    point=eye+basis@np.array(((px-self.width*.62)*unit,(self.height/2-py)*unit,-5.9))
+                    point=eye+basis@np.array(((px-center_x)*unit,(self.height/2-py)*unit,-5.9))
                     size=(2.5+2*(j%3))*unit*activity
                     renderer.box(point,(size,size,size),MINT,rot=basis,emission=.6)
 

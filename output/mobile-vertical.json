@@ -1,0 +1,32 @@
+{
+  "duration": 15.2,
+  "cta_start": 13.0,
+  "phrases": [
+    {
+      "text": "Um jogo educativo independente para estudar Análise e Desenvolvimento de Sistemas",
+      "start": 0.25,
+      "hold": 4.4,
+      "end": 5.3500000000000005
+    },
+    {
+      "text": "Acerte os desafios por fases",
+      "start": 5.5,
+      "hold": 2.8,
+      "end": 8.929999999999998
+    },
+    {
+      "text": "Reconstrua uma cidade digital enquanto constrói aprendizado real",
+      "start": 9.1,
+      "hold": 3.0,
+      "end": 12.8
+    }
+  ],
+  "city_complete": 12.799926081330186,
+  "formations": {
+    "center": [
+      "portal",
+      "districts",
+      "building"
+    ]
+  }
+}

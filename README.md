@@ -22,7 +22,19 @@ cd Abertura.ENADE.ADS-2026
 python3 scripts/serve.py
 ```
 
-Abra **http://localhost:4173**. A apresentação aparece limpa, sem barra de tempo, cronômetro ou botões de controle sobre o vídeo. Clique na imagem ou pressione **Espaço** para pausar/continuar, **F** para tela cheia e **R** para assistir novamente. Um clique duplo também alterna a tela cheia. A chamada final permanece visível em tela cheia. Com movimento reduzido, a reprodução aguarda um clique ou a tecla Espaço.
+Abra **http://localhost:4173**. A apresentação aparece limpa, sem barra de tempo, cronômetro ou botões de controle sobre o vídeo. Clique na imagem para entrar em tela cheia; no celular, basta um toque nos navegadores compatíveis. Em tela cheia, clique/toque ou pressione **Espaço** para pausar/continuar. **F** alterna a tela cheia e **R** permite assistir novamente. Um clique duplo dentro da tela cheia permite sair. A chamada final permanece visível em tela cheia. Com movimento reduzido, a reprodução aguarda um clique ou a tecla Espaço.
+
+## No celular
+
+Em telas de celular, a página seleciona automaticamente o vídeo **vertical, 720 × 1280, com uma única formação**. Em pé, ele preenche a janela; ao girar o aparelho, o vídeo vertical é preservado sem cortar a cena. As três frases, seus tempos e a chamada Jogar agora aos 13 s são mantidos. O player continua limpo, sem controles sobrepostos.
+
+No computador, o vídeo horizontal aprovado, com as duas formações, permanece sem alterações.
+
+Para gerar somente a versão mobile:
+
+```bash
+python3 scripts/render_opening.py --format portrait --copies 1
+```
 
 ## Como a animação funciona
 

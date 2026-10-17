@@ -556,10 +556,10 @@ def main():
     if not LANDSCAPE and FOREGROUND_COPIES==2:
         parser.error('Duas formações requerem --format landscape.')
     W,H = (1920,1080) if LANDSCAPE else (720,1280)
-    ANIMATED_PHRASES=LANDSCAPE and FOREGROUND_COPIES==2 and not args.no_phrases
+    ANIMATED_PHRASES=(not LANDSCAPE or FOREGROUND_COPIES==2) and not args.no_phrases
     DURATION=15.2 if ANIMATED_PHRASES else 13.0
     label='horizontal-dupla' if FOREGROUND_COPIES==2 else ('horizontal' if LANDSCAPE else 'v2')
-    if ANIMATED_PHRASES:label='dupla-dinamica'
+    if ANIMATED_PHRASES:label='dupla-dinamica' if LANDSCAPE else 'mobile-vertical'
     video_name = f'ENADE.ADS-2026-abertura-3D-{label}.mp4'
     poster_name = f'poster-{label}.jpg'
     OUT.mkdir(exist_ok=True)
@@ -570,7 +570,7 @@ def main():
             'duration':DURATION,'cta_start':13.0,
             'phrases':[{'text':p.text,'start':p.start,'hold':p.hold,'end':p.end} for p in PHRASES],
             'city_complete':max(11.55+(part.pos[1]+5)/10*.90+delay for (_,_,part),delay in zip(r.arrangements,r.delays)),
-            'formations':{'left':['portal','districts','building'],'right':['districts','portal','building']},
+            'formations':({'left':['portal','districts','building'],'right':['districts','portal','building']} if FOREGROUND_COPIES==2 else {'center':['portal','districts','building']}),
         },ensure_ascii=False,indent=2))
     if args.stills:
         times=[.8,2.0,3.6,5.2,8.8,11.0,12.9,14.0] if ANIMATED_PHRASES else [1.8,2.6,4.8,6.4,7.8,9.0,10.5,12.8]
@@ -579,11 +579,11 @@ def main():
         board=Image.new('RGB',(4*thumb_w,2*row_h),(7,18,20))
         d=ImageDraw.Draw(board)
         for i,t in enumerate(times):
-            prefix=f'frame-{label}' if LANDSCAPE else 'frame'
+            prefix=f'frame-{label}' if LANDSCAPE or ANIMATED_PHRASES else 'frame'
             im=r.render(t,extract_frame(t));im.save(OUT/f'{prefix}-{t:04.1f}.jpg',quality=93)
             board.paste(im.resize((thumb_w,thumb_h)),((i%4)*thumb_w,(i//4)*row_h))
             d.text(((i%4)*thumb_w+12,(i//4)*row_h+thumb_h+6),f'{t:.1f} s',fill='#b7d6ca')
-        board.save(OUT/(f'storyboard-{label}.jpg' if LANDSCAPE else 'storyboard-3D.jpg'),quality=94)
+        board.save(OUT/(f'storyboard-{label}.jpg' if LANDSCAPE or ANIMATED_PHRASES else 'storyboard-3D.jpg'),quality=94)
         print('Storyboard saved',flush=True)
         return
     # Spool lossless reference frames to disk; reverse playback must not keep
@@ -603,7 +603,8 @@ def main():
         image=r.render(frame/FPS,last)
         encoder.stdin.write(image.tobytes())
         if frame%25==0:print(f'Rendering {frame/FPS:04.1f}/{DURATION:.0f}s',flush=True)
-        if frame==round((3.6 if ANIMATED_PHRASES else 1.8)*FPS):image.save(OUT/poster_name,quality=95)
+        poster_time=2.0 if ANIMATED_PHRASES and not LANDSCAPE else (3.6 if ANIMATED_PHRASES else 1.8)
+        if frame==round(poster_time*FPS):image.save(OUT/poster_name,quality=95)
     encoder.stdin.close()
     if encoder.wait()!=0:raise RuntimeError('FFmpeg encode failed')
     print('MP4 complete:',OUT/video_name,flush=True)

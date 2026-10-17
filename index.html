@@ -14,6 +14,7 @@
     .stage {position:fixed;inset:0;width:100%;height:100%;height:100dvh;background:#081517;isolation:isolate}
     .stage:fullscreen,.stage:-webkit-full-screen {width:100%;height:100%;background:#081517}
     video {display:block;width:100%;height:100%;object-fit:contain;background:#081517}
+    @media(orientation:portrait){.stage[data-layout="mobile"] video{object-fit:cover}}
     a {display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:0 15px;border:1px solid #638574;border-radius:5px;background:#0b191aef;color:#edf0e4;font:inherit;font-size:14px;line-height:1;text-decoration:none;cursor:pointer}
     a:hover {background:#193a31;border-color:#b5d8bb}
     a:focus-visible {outline:2px solid #d4ebc7;outline-offset:4px}
@@ -53,6 +54,7 @@
 <body>
   <main class="stage" id="stage" aria-label="Animação ENADE ADS 2026 em tela cheia">
     <video id="opening" tabindex="0" aria-describedby="playback-help" data-cta-start="13" playsinline muted preload="auto" poster="/output/poster-dupla-dinamica.jpg" aria-label="Abertura 3D horizontal com três frases com letras 3D arredondadas e transições rápidas, portal e torres em montagens simultâneas diferentes e a construção de dois prédios.">
+      <source src="/output/ENADE.ADS-2026-abertura-3D-mobile-vertical.mp4" media="(max-width: 767px), (pointer: coarse) and (max-width: 1023px)" type="video/mp4">
       <source src="/output/ENADE.ADS-2026-abertura-3D-dupla-dinamica.mp4" type="video/mp4">
       <track kind="captions" src="/output/dupla-dinamica.vtt" srclang="pt-BR" label="Português">
       Seu navegador não reproduz este vídeo.
@@ -65,12 +67,20 @@
         <span class="voxel-title" id="voxel-title" aria-hidden="true"></span>
       </a>
     </div>
-    <p class="sr-only" id="playback-help">Clique na animação ou pressione Espaço para pausar ou continuar. Pressione F para tela cheia e R para assistir novamente.</p>
+    <p class="sr-only" id="playback-help">Clique na animação para entrar em tela cheia. Pressione Espaço para pausar ou continuar, F para alternar a tela cheia e R para assistir novamente.</p>
     <p class="status" id="status" role="status" hidden></p>
   </main>
   <script>
     const stage = document.getElementById('stage');
     const video = document.getElementById('opening');
+    const selectedSource = [...video.querySelectorAll('source')].find(source => !source.media || window.matchMedia(source.media).matches);
+    const mobileLayout = Boolean(selectedSource.media);
+    stage.dataset.layout = mobileLayout ? 'mobile' : 'desktop';
+    if (mobileLayout) {
+      video.poster = '/output/poster-mobile-vertical.jpg';
+      video.setAttribute('aria-label','Abertura 3D vertical com três frases, uma formação de portal e torres e a construção de um prédio.');
+      document.getElementById('playback-help').textContent = 'Toque na animação para entrar em tela cheia nos navegadores compatíveis. Em tela cheia, toque para pausar ou continuar.';
+    }
     const status = document.getElementById('status');
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let idleTimer;
@@ -163,7 +173,7 @@
     }
     updateInvitation();
 
-    const videoSource = video.querySelector('source').src;
+    const videoSource = selectedSource.src;
     let localVideoUrl;
     let localVideoPromise;
 
@@ -205,8 +215,27 @@
       else if (video.paused) video.play().catch(() => message('Clique na animação para iniciar.'));
       else video.pause();
     }
-    video.addEventListener('click',togglePlayback);
-    video.addEventListener('dblclick',toggleFullscreen);
+    let fullscreenEnteredByClick = false;
+    video.addEventListener('click',event => {
+      if (event.detail > 1) return;
+      const fullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+      if (!fullscreen && (stage.requestFullscreen || stage.webkitRequestFullscreen)) {
+        // User activation hides browser navigation without isolating the video.
+        fullscreenEnteredByClick = true;
+        if (stage.requestFullscreen) stage.requestFullscreen({navigationUI:'hide'}).catch(() => {});
+        else stage.webkitRequestFullscreen();
+        if (video.paused && !video.ended) video.play().catch(() => {});
+      } else {
+        fullscreenEnteredByClick = false;
+        togglePlayback();
+      }
+    });
+    video.addEventListener('dblclick',() => {
+      if (fullscreenEnteredByClick) return;
+      // Restore the playback state changed by the first click before exiting.
+      togglePlayback();
+      toggleFullscreen();
+    });
     for (const event of ['loadedmetadata','timeupdate','play','pause','ended','seeking','seeked','emptied']) video.addEventListener(event,updateInvitation);
     video.addEventListener('canplay',() => {if (!canSeekVideo()) prepareLocalVideo().catch(() => {});});
     video.controls = false;
