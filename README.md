@@ -22,7 +22,7 @@ cd Abertura.ENADE.ADS-2026
 python3 scripts/serve.py
 ```
 
-Abra **http://localhost:4173**. O player inclui pausa, busca na linha do tempo, legendas, repetição, download e tela cheia. A chamada final também aparece em tela cheia. Com movimento reduzido, a reprodução aguarda uma ação da pessoa.
+Abra **http://localhost:4173**. A apresentação aparece limpa, sem barra de tempo, cronômetro ou botões de controle sobre o vídeo. Clique na imagem ou pressione **Espaço** para pausar/continuar, **F** para tela cheia e **R** para assistir novamente. Um clique duplo também alterna a tela cheia. A chamada final permanece visível em tela cheia. Com movimento reduzido, a reprodução aguarda um clique ou a tecla Espaço.
 
 ## Como a animação funciona
 

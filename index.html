@@ -14,19 +14,12 @@
     .stage {position:fixed;inset:0;width:100%;height:100%;height:100dvh;background:#081517;isolation:isolate}
     .stage:fullscreen,.stage:-webkit-full-screen {width:100%;height:100%;background:#081517}
     video {display:block;width:100%;height:100%;object-fit:contain;background:#081517}
-    .toolbar {position:absolute;z-index:2;top:max(16px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));display:flex;align-items:center;gap:8px;transition:opacity 180ms ease-out}
-    button,a {display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:0 15px;border:1px solid #638574;border-radius:5px;background:#0b191aef;color:#edf0e4;font:inherit;font-size:14px;line-height:1;text-decoration:none;cursor:pointer}
-    button:hover,a:hover {background:#193a31;border-color:#b5d8bb}
-    button:focus-visible,a:focus-visible {outline:2px solid #d4ebc7;outline-offset:4px}
-    svg {width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
-    .icon {width:44px;padding:0}
+    a {display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:0 15px;border:1px solid #638574;border-radius:5px;background:#0b191aef;color:#edf0e4;font:inherit;font-size:14px;line-height:1;text-decoration:none;cursor:pointer}
+    a:hover {background:#193a31;border-color:#b5d8bb}
+    a:focus-visible {outline:2px solid #d4ebc7;outline-offset:4px}
     .idle {cursor:none}
-    .idle .toolbar {opacity:0;pointer-events:none}
-    .idle .toolbar:focus-within {opacity:1;pointer-events:auto}
     .status {position:absolute;z-index:3;bottom:max(85px,calc(env(safe-area-inset-bottom) + 75px));left:50%;transform:translateX(-50%);max-width:calc(100% - 32px);margin:0;padding:12px 18px;background:#0b191af5;border:1px solid #638574;border-radius:5px;font-size:14px;line-height:1.5;text-align:center}
     [hidden] {display:none!important}
-    @media(max-width:600px){.toolbar{top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));gap:6px}button,a{font-size:12px;padding:0 12px}.icon{padding:0}}
-    @media(prefers-reduced-motion:reduce){.toolbar{transition:none}}
     .play-invitation {position:absolute;z-index:2;left:50%;top:max(26px,env(safe-area-inset-top));transform:translateX(-50%);isolation:isolate;perspective:900px}
     .play-reflection {position:absolute;z-index:-1;inset:-48px -76px -64px;background:radial-gradient(ellipse,#1ed760d9 0%,#1ed76088 28%,#1ed76035 48%,#1ed76000 73%);filter:blur(12px);opacity:.04;pointer-events:none}
     .play-cta {--unit:clamp(3px,.36vw,5.5px);position:relative;display:flex;padding:13px 18px 16px;min-height:54px;border:1px solid #1ed76099;border-bottom-color:#0b5b2b;border-radius:3px;background:#04110bf2;color:#1ed760;box-shadow:0 5px 0 #07391b;transform-style:preserve-3d;transition:transform 140ms ease-out;touch-action:manipulation}
@@ -52,41 +45,18 @@
     @keyframes green-reflection {0%,18%,100%{opacity:.025}40%,62%{opacity:1}82%{opacity:.06}}
     @keyframes letter-illumination {0%,18%,100%{opacity:.07}40%,62%{opacity:1}82%{opacity:.12}}
     @keyframes light-through-letters {0%,18%{opacity:0;transform:translateX(-180%) skewX(-24deg)}38%{opacity:.8}62%{opacity:.8}80%,100%{opacity:0;transform:translateX(550%) skewX(-24deg)}}
-    @media(max-width:740px){.play-invitation{top:max(82px,calc(env(safe-area-inset-top) + 72px))}.play-cta{padding:12px 16px 15px}}
+    @media(max-width:740px){.play-invitation{top:max(26px,env(safe-area-inset-top))}.play-cta{padding:12px 16px 15px}}
     @media(max-height:480px) and (min-width:741px){.play-invitation{top:18px}.play-cta{--unit:3.6px;padding:11px 16px 14px;min-height:50px}}
     @media(prefers-reduced-motion:reduce){.play-invitation.is-ready .play-cube{animation:none;opacity:1;transform:none}.play-invitation.is-ready .play-reflection,.play-invitation.is-ready .cta-light-field,.play-invitation.is-ready .play-cta::after{animation:none;opacity:.65}.play-invitation.is-ready .voxel-light{animation:none;opacity:1}.play-invitation.is-ready .cta-light-field::before{animation:none;opacity:0}.play-cta{transition:none}}
-    .transport {position:absolute;z-index:3;left:0;right:0;bottom:0;display:flex;align-items:center;gap:12px;padding:22px max(16px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:linear-gradient(transparent,#04100be6);transition:opacity 180ms ease-out}
-    .transport button {background:#081517bf;border-color:#63857466;flex-shrink:0}
-    .transport button[aria-pressed="true"] {border-color:#1ed760;color:#8cffb4}
-    #timeline {flex:1;min-width:24px;height:44px;margin:0;accent-color:#1ed760;cursor:pointer}
-    #timeline:focus-visible {outline:2px solid #1ed760;outline-offset:2px}
-    #playback-time {font-size:.8rem;white-space:nowrap;font-variant-numeric:tabular-nums;color:#edf0e4}
-    #captions {font-size:.8rem;font-weight:700}
-    .idle .transport {opacity:0;pointer-events:none}
-    .idle .transport:focus-within {opacity:1;pointer-events:auto}
-    @media(max-width:600px){.transport{gap:6px;padding-inline:10px}#playback-time{font-size:.7rem}.transport .icon{width:40px}}
-    @media(prefers-reduced-motion:reduce){.transport{transition:none}}
   </style>
 </head>
 <body>
   <main class="stage" id="stage" aria-label="Animação ENADE ADS 2026 em tela cheia">
-    <video id="opening" data-cta-start="13" controls playsinline muted preload="auto" poster="/output/poster-dupla-dinamica.jpg" aria-label="Abertura 3D horizontal com três frases com letras 3D arredondadas e transições rápidas, portal e torres em montagens simultâneas diferentes e a construção de dois prédios.">
+    <video id="opening" tabindex="0" aria-describedby="playback-help" data-cta-start="13" playsinline muted preload="auto" poster="/output/poster-dupla-dinamica.jpg" aria-label="Abertura 3D horizontal com três frases com letras 3D arredondadas e transições rápidas, portal e torres em montagens simultâneas diferentes e a construção de dois prédios.">
       <source src="/output/ENADE.ADS-2026-abertura-3D-dupla-dinamica.mp4" type="video/mp4">
       <track kind="captions" src="/output/dupla-dinamica.vtt" srclang="pt-BR" label="Português">
-      Seu navegador não reproduz este vídeo. Use o botão Baixar vídeo.
+      Seu navegador não reproduz este vídeo.
     </video>
-    <nav class="toolbar" aria-label="Controles da animação">
-      <button id="fullscreen" type="button" aria-label="Entrar em tela cheia" aria-keyshortcuts="f" title="Tela cheia (F)">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg>
-        <span id="fullscreen-label">Tela cheia</span>
-      </button>
-      <button class="icon" id="replay" type="button" aria-label="Reproduzir do início" title="Reproduzir do início">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/></svg>
-      </button>
-      <a class="icon" href="/output/ENADE.ADS-2026-abertura-3D-dupla-dinamica.mp4" download="ENADE.ADS-2026-abertura-3D-dupla-dinamica.mp4" aria-label="Baixar vídeo" title="Baixar vídeo">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg>
-      </a>
-    </nav>
     <div class="play-invitation" id="play-invitation" hidden>
       <span class="play-reflection" aria-hidden="true"></span>
       <a class="play-cta" id="play-now" href="https://enade-ads-2026.vercel.app/" aria-label="Jogar agora — abrir ENADE ADS 2026">
@@ -95,24 +65,12 @@
         <span class="voxel-title" id="voxel-title" aria-hidden="true"></span>
       </a>
     </div>
-    <nav class="transport" aria-label="Reprodução da animação" hidden>
-      <button class="icon" id="play-toggle" type="button" aria-label="Pausar animação" title="Pausar animação">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path id="play-icon" d="M8 5v14M16 5v14"/></svg>
-      </button>
-      <input id="timeline" type="range" min="0" max="15.2" step="0.04" value="0" aria-label="Posição da animação">
-      <output id="playback-time" aria-live="off">0:00 / 0:15</output>
-      <button class="icon" id="captions" type="button" aria-label="Mostrar legendas" aria-pressed="false" title="Mostrar legendas"><span aria-hidden="true">CC</span></button>
-      <button class="icon" id="transport-fullscreen" type="button" aria-label="Entrar em tela cheia" title="Tela cheia (F)">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg>
-      </button>
-    </nav>
+    <p class="sr-only" id="playback-help">Clique na animação ou pressione Espaço para pausar ou continuar. Pressione F para tela cheia e R para assistir novamente.</p>
     <p class="status" id="status" role="status" hidden></p>
   </main>
   <script>
     const stage = document.getElementById('stage');
     const video = document.getElementById('opening');
-    const fullscreenButton = document.getElementById('fullscreen');
-    const fullscreenLabel = document.getElementById('fullscreen-label');
     const status = document.getElementById('status');
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let idleTimer;
@@ -123,50 +81,34 @@
       clearTimeout(idleTimer);
       if (!video.paused && !video.ended) idleTimer=setTimeout(() => stage.classList.add('idle'),2600);
     }
-    function updateFullscreen() {
-      const active=Boolean(document.fullscreenElement || document.webkitFullscreenElement || video.webkitDisplayingFullscreen);
-      fullscreenLabel.textContent=active ? 'Sair da tela cheia' : 'Tela cheia';
-      fullscreenButton.setAttribute('aria-label',active ? 'Sair da tela cheia' : 'Entrar em tela cheia');
-      fullscreenButton.title=active ? 'Sair da tela cheia (Esc)' : 'Tela cheia (F)';
-      const transportFullscreen = document.getElementById('transport-fullscreen');
-      transportFullscreen.setAttribute('aria-label',active ? 'Sair da tela cheia' : 'Entrar em tela cheia');
-      transportFullscreen.title = fullscreenButton.title;
-      updateInvitation();
-      wake();
-    }
+    function updateFullscreen() {updateInvitation();wake();}
     async function toggleFullscreen() {
       try {
         if (document.fullscreenElement) await document.exitFullscreen();
         else if (document.webkitFullscreenElement) document.webkitExitFullscreen();
-        else if (video.webkitDisplayingFullscreen && video.webkitExitFullscreen) video.webkitExitFullscreen();
-        else {
-          if (stage.requestFullscreen) await stage.requestFullscreen();
-          else if (stage.webkitRequestFullscreen) stage.webkitRequestFullscreen();
-          else {message('Use a opção de tela cheia do navegador.');return;}
-        }
-      } catch {message('Use o controle de tela cheia do vídeo ou a opção do navegador.');}
+        else if (stage.requestFullscreen) await stage.requestFullscreen();
+        else if (stage.webkitRequestFullscreen) stage.webkitRequestFullscreen();
+        else message('Use a opção de tela cheia do navegador.');
+      } catch {message('Use a opção de tela cheia do navegador.');}
       updateFullscreen();
     }
-    fullscreenButton.addEventListener('click',toggleFullscreen);
-    document.getElementById('transport-fullscreen').addEventListener('click',toggleFullscreen);
-    document.getElementById('replay').addEventListener('click',restartVideo);
     document.addEventListener('fullscreenchange',updateFullscreen);
     document.addEventListener('webkitfullscreenchange',updateFullscreen);
-    video.addEventListener('webkitbeginfullscreen',updateFullscreen);
-    video.addEventListener('webkitendfullscreen',updateFullscreen);
     stage.addEventListener('pointermove',wake,{passive:true});
     stage.addEventListener('pointerdown',wake,{passive:true});
     stage.addEventListener('focusin',wake);
     for (const event of ['play','pause','ended']) video.addEventListener(event,wake);
-    video.addEventListener('error',() => message('Não foi possível carregar o vídeo. Atualize a página ou use Baixar vídeo.'));
+    video.addEventListener('error',() => message('Não foi possível carregar o vídeo. Atualize a página para tentar novamente.'));
     document.addEventListener('keydown',event => {
+      if (event.ctrlKey || event.metaKey || event.altKey || event.repeat || event.target.closest('a,button,input,textarea,select')) return;
+      const key = event.key.toLowerCase();
+      if (key === 'f') {event.preventDefault();toggleFullscreen();}
+      else if (key === ' ' || key === 'k') {event.preventDefault();togglePlayback();}
+      else if (key === 'r') {event.preventDefault();restartVideo();}
       wake();
-      if (!event.ctrlKey && !event.metaKey && !event.altKey && event.key.toLowerCase()==='f') {
-        event.preventDefault();toggleFullscreen();
-      }
     });
     motion.addEventListener('change',event => {if(event.matches)video.pause();});
-    // The CTA has its own clock; it cannot delay the approved video.
+    // The CTA keeps its own clock without delaying or repeating the video.
     const invitation = document.getElementById('play-invitation');
     const title = document.getElementById('voxel-title');
     const glyphs = {
@@ -221,32 +163,10 @@
     }
     updateInvitation();
 
-    const transport = document.querySelector('.transport');
-    const playToggle = document.getElementById('play-toggle');
-    const playIcon = document.getElementById('play-icon');
-    const timeline = document.getElementById('timeline');
-    const playbackTime = document.getElementById('playback-time');
-    const captionsButton = document.getElementById('captions');
     const videoSource = video.querySelector('source').src;
     let localVideoUrl;
     let localVideoPromise;
-    let seekingByControl = false;
 
-    function formatTime(seconds) {
-      const total = Math.floor(Number.isFinite(seconds) ? seconds : 0);
-      return `${Math.floor(total / 60)}:${String(total % 60).padStart(2,'0')}`;
-    }
-    function updatePlayback() {
-      const playing = !video.paused && !video.ended;
-      playToggle.setAttribute('aria-label',playing ? 'Pausar animação' : (video.ended ? 'Reproduzir do início' : 'Reproduzir animação'));
-      playToggle.title = playToggle.getAttribute('aria-label');
-      playIcon.setAttribute('d',playing ? 'M8 5v14M16 5v14' : 'M8 5l11 7-11 7Z');
-      if (Number.isFinite(video.duration)) timeline.max = video.duration;
-      if (!seekingByControl) timeline.value = video.currentTime;
-      playbackTime.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
-      timeline.setAttribute('aria-valuetext',`${formatTime(video.currentTime)} de ${formatTime(video.duration)}`);
-      updateInvitation();
-    }
     function canSeekVideo() {
       return video.currentSrc.startsWith('blob:') || (video.seekable.length > 0 && video.seekable.end(video.seekable.length-1) > 0);
     }
@@ -260,7 +180,6 @@
       return localVideoPromise;
     }
     async function seekVideo(seconds, resume = !video.paused) {
-      seekingByControl = true;
       video.pause();
       try {
         // A local Blob supports seeking when hosting does not serve byte ranges.
@@ -277,36 +196,21 @@
         video.currentTime = Math.max(0,Math.min(seconds,video.duration));
         updateInvitation();
         if (resume) await video.play();
-      } catch {message('Não foi possível mudar a posição. Use Reproduzir do início para tentar novamente.');}
-      finally {seekingByControl = false;updatePlayback();wake();}
+      } catch {message('Não foi possível reiniciar a animação. Atualize a página para tentar novamente.');}
+      finally {updateInvitation();wake();}
     }
     function restartVideo() {return seekVideo(0,true);}
     function togglePlayback() {
       if (video.ended) restartVideo();
-      else if (video.paused) video.play().catch(() => message('Use o botão de reprodução para iniciar.'));
+      else if (video.paused) video.play().catch(() => message('Clique na animação para iniciar.'));
       else video.pause();
     }
-    playToggle.addEventListener('click',togglePlayback);
     video.addEventListener('click',togglePlayback);
-    timeline.addEventListener('change',() => seekVideo(Number(timeline.value)));
-    timeline.addEventListener('pointerdown',() => {seekingByControl = true;});
-    timeline.addEventListener('pointerup',() => {seekingByControl = false;});
-    captionsButton.addEventListener('click',() => {
-      const track = video.textTracks[0];
-      if (!track) return;
-      const show = track.mode !== 'showing';
-      track.mode = show ? 'showing' : 'disabled';
-      captionsButton.setAttribute('aria-pressed',String(show));
-      captionsButton.setAttribute('aria-label',show ? 'Ocultar legendas' : 'Mostrar legendas');
-      captionsButton.title = captionsButton.getAttribute('aria-label');
-    });
-    for (const event of ['loadedmetadata','timeupdate','play','pause','ended','seeking','seeked','emptied']) video.addEventListener(event,updatePlayback);
+    video.addEventListener('dblclick',toggleFullscreen);
+    for (const event of ['loadedmetadata','timeupdate','play','pause','ended','seeking','seeked','emptied']) video.addEventListener(event,updateInvitation);
     video.addEventListener('canplay',() => {if (!canSeekVideo()) prepareLocalVideo().catch(() => {});});
-    // Every visible fullscreen control now includes the video, CTA and controls.
     video.controls = false;
-    transport.hidden = false;
-    updatePlayback();
-
+    updateInvitation();
     if (!motion.matches) video.play().catch(() => {});
   </script>
 </body>
