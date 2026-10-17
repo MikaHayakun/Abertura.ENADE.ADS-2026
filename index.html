@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#081517">
+  <meta name="robots" content="noindex, nofollow">
+  <title>ENADE.ADS–2026 · Animação em tela cheia</title>
+  <style>
+    @font-face {font-family:Fira;src:url('/assets/FiraSans-Regular.otf');font-display:swap}
+    :root {color-scheme:dark;font-family:Fira,sans-serif;background:#081517;color:#edf0e4}
+    * {box-sizing:border-box}
+    html,body {width:100%;height:100%;margin:0;overflow:hidden}
+    .stage {position:fixed;inset:0;width:100%;height:100%;height:100dvh;background:#081517;isolation:isolate}
+    .stage:fullscreen,.stage:-webkit-full-screen {width:100%;height:100%;background:#081517}
+    video {display:block;width:100%;height:100%;object-fit:contain;background:#081517}
+    .toolbar {position:absolute;z-index:2;top:max(16px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));display:flex;align-items:center;gap:8px;transition:opacity 180ms ease-out}
+    button,a {display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:0 15px;border:1px solid #638574;border-radius:5px;background:#0b191aef;color:#edf0e4;font:inherit;font-size:14px;line-height:1;text-decoration:none;cursor:pointer}
+    button:hover,a:hover {background:#193a31;border-color:#b5d8bb}
+    button:focus-visible,a:focus-visible {outline:2px solid #d4ebc7;outline-offset:4px}
+    svg {width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+    .icon {width:44px;padding:0}
+    .idle {cursor:none}
+    .idle .toolbar {opacity:0;pointer-events:none}
+    .idle .toolbar:focus-within {opacity:1;pointer-events:auto}
+    .status {position:absolute;z-index:3;bottom:max(85px,calc(env(safe-area-inset-bottom) + 75px));left:50%;transform:translateX(-50%);max-width:calc(100% - 32px);margin:0;padding:12px 18px;background:#0b191af5;border:1px solid #638574;border-radius:5px;font-size:14px;line-height:1.5;text-align:center}
+    [hidden] {display:none!important}
+    @media(max-width:600px){.toolbar{top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));gap:6px}button,a{font-size:12px;padding:0 12px}.icon{padding:0}}
+    @media(prefers-reduced-motion:reduce){.toolbar{transition:none}}
+    .play-invitation {position:absolute;z-index:2;left:50%;top:max(26px,env(safe-area-inset-top));transform:translateX(-50%);isolation:isolate;perspective:900px}
+    .play-reflection {position:absolute;z-index:-1;inset:-48px -76px -64px;background:radial-gradient(ellipse,#1ed760d9 0%,#1ed76088 28%,#1ed76035 48%,#1ed76000 73%);filter:blur(12px);opacity:.04;pointer-events:none}
+    .play-cta {--unit:clamp(3px,.36vw,5.5px);position:relative;display:flex;padding:13px 18px 16px;min-height:54px;border:1px solid #1ed76099;border-bottom-color:#0b5b2b;border-radius:3px;background:#04110bf2;color:#1ed760;box-shadow:0 5px 0 #07391b;transform-style:preserve-3d;transition:transform 140ms ease-out;touch-action:manipulation}
+    .play-cta::after {content:'';position:absolute;inset:-1px;border:1px solid #82ffad;border-radius:inherit;box-shadow:0 0 14px #1ed760,0 0 34px #1ed760c4,inset 0 0 20px #1ed7608c;pointer-events:none;opacity:.04}
+    .play-cta:hover {background:#04110bf2;transform:translateY(-2px);border-color:#97ffb9}
+    .play-cta:active {transform:translateY(2px)}
+    .play-cta:focus-visible {outline:3px solid #1ed760;outline-offset:9px}
+    .cta-light-field {position:absolute;inset:0;overflow:hidden;border-radius:inherit;background:radial-gradient(ellipse at 50% 55%,#1ed760e6 0%,#1ed76099 40%,#1ed76030 75%,#1ed76008 100%);transform:translateZ(2px);opacity:.04;pointer-events:none}
+    .cta-light-field::before {content:'';position:absolute;inset:-80% auto -80% 0;width:28%;background:linear-gradient(90deg,#a7ffc200,#c4ffd7dd,#a7ffc200);transform:translateX(-180%) skewX(-24deg);opacity:0}
+    .voxel-title {position:relative;display:block;width:calc(var(--columns) * var(--unit));height:calc(7 * var(--unit));transform:translateZ(22px) rotateX(-10deg) rotateY(-3deg);transform-style:preserve-3d;pointer-events:none}
+    .play-cube {position:absolute;left:calc(var(--x) * var(--unit));top:calc(var(--y) * var(--unit));width:calc(var(--unit) - .5px);height:calc(var(--unit) - .5px);transform-style:preserve-3d;opacity:0}
+    .cube-face {position:absolute;inset:0;backface-visibility:hidden;background:#1a9446;transform:translateZ(calc(var(--unit) / 2))}
+    .cube-top {background:#49f785;transform:rotateX(90deg) translateZ(calc(var(--unit) / 2))}
+    .cube-side {background:#0b622e;transform:rotateY(90deg) translateZ(calc(var(--unit) / 2))}
+    .voxel-light {position:absolute;inset:0;transform:translateZ(6px);filter:drop-shadow(0 0 2px #1ed760) drop-shadow(0 0 6px #1ed760);opacity:0;pointer-events:none}
+    .voxel-light-mask {position:absolute;inset:0;background:#caffdc;mask-image:var(--letter-mask);mask-size:100% 100%;mask-repeat:no-repeat}
+    .play-invitation.is-ready .play-cube {animation:cube-arrival 460ms cubic-bezier(.22,1,.36,1) var(--delay) both}
+    .play-invitation.is-ready .play-reflection,.play-invitation.is-ready .cta-light-field,.play-invitation.is-ready .play-cta::after {animation:green-reflection 3.2s ease-in-out 1.5s infinite both}
+    .play-invitation.is-ready .voxel-light {animation:letter-illumination 3.2s ease-in-out 1.5s infinite forwards}
+    .play-invitation.is-ready .cta-light-field::before {animation:light-through-letters 3.2s ease-in-out 1.5s infinite both}
+    .sr-only {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @keyframes cube-arrival {from{opacity:0;transform:translate3d(var(--dx),var(--dy),80px) rotateX(65deg) rotateY(-45deg)}to{opacity:1;transform:translate3d(0,0,0) rotateX(0) rotateY(0)}}
+    @keyframes green-reflection {0%,18%,100%{opacity:.025}40%,62%{opacity:1}82%{opacity:.06}}
+    @keyframes letter-illumination {0%,18%,100%{opacity:.07}40%,62%{opacity:1}82%{opacity:.12}}
+    @keyframes light-through-letters {0%,18%{opacity:0;transform:translateX(-180%) skewX(-24deg)}38%{opacity:.8}62%{opacity:.8}80%,100%{opacity:0;transform:translateX(550%) skewX(-24deg)}}
+    @media(max-width:740px){.play-invitation{top:max(82px,calc(env(safe-area-inset-top) + 72px))}.play-cta{padding:12px 16px 15px}}
+    @media(max-height:480px) and (min-width:741px){.play-invitation{top:18px}.play-cta{--unit:3.6px;padding:11px 16px 14px;min-height:50px}}
+    @media(prefers-reduced-motion:reduce){.play-invitation.is-ready .play-cube{animation:none;opacity:1;transform:none}.play-invitation.is-ready .play-reflection,.play-invitation.is-ready .cta-light-field,.play-invitation.is-ready .play-cta::after{animation:none;opacity:.65}.play-invitation.is-ready .voxel-light{animation:none;opacity:1}.play-invitation.is-ready .cta-light-field::before{animation:none;opacity:0}.play-cta{transition:none}}
+    .transport {position:absolute;z-index:3;left:0;right:0;bottom:0;display:flex;align-items:center;gap:12px;padding:22px max(16px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:linear-gradient(transparent,#04100be6);transition:opacity 180ms ease-out}
+    .transport button {background:#081517bf;border-color:#63857466;flex-shrink:0}
+    .transport button[aria-pressed="true"] {border-color:#1ed760;color:#8cffb4}
+    #timeline {flex:1;min-width:24px;height:44px;margin:0;accent-color:#1ed760;cursor:pointer}
+    #timeline:focus-visible {outline:2px solid #1ed760;outline-offset:2px}
+    #playback-time {font-size:.8rem;white-space:nowrap;font-variant-numeric:tabular-nums;color:#edf0e4}
+    #captions {font-size:.8rem;font-weight:700}
+    .idle .transport {opacity:0;pointer-events:none}
+    .idle .transport:focus-within {opacity:1;pointer-events:auto}
+    @media(max-width:600px){.transport{gap:6px;padding-inline:10px}#playback-time{font-size:.7rem}.transport .icon{width:40px}}
+    @media(prefers-reduced-motion:reduce){.transport{transition:none}}
+  </style>
+</head>
+<body>
+  <main class="stage" id="stage" aria-label="Animação ENADE ADS 2026 em tela cheia">
+    <video id="opening" data-cta-start="13" controls playsinline muted preload="auto" poster="/output/poster-dupla-dinamica.jpg" aria-label="Abertura 3D horizontal com três frases com letras 3D arredondadas e transições rápidas, portal e torres em montagens simultâneas diferentes e a construção de dois prédios.">
+      <source src="/output/ENADE.ADS-2026-abertura-3D-dupla-dinamica.mp4" type="video/mp4">
+      <track kind="captions" src="/output/dupla-dinamica.vtt" srclang="pt-BR" label="Português">
+      Seu navegador não reproduz este vídeo. Use o botão Baixar vídeo.
+    </video>
+    <nav class="toolbar" aria-label="Controles da animação">
+      <button id="fullscreen" type="button" aria-label="Entrar em tela cheia" aria-keyshortcuts="f" title="Tela cheia (F)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg>
+        <span id="fullscreen-label">Tela cheia</span>
+      </button>
+      <button class="icon" id="replay" type="button" aria-label="Reproduzir do início" title="Reproduzir do início">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/></svg>
+      </button>
+      <a class="icon" href="/output/ENADE.ADS-2026-abertura-3D-dupla-dinamica.mp4" download="ENADE.ADS-2026-abertura-3D-dupla-dinamica.mp4" aria-label="Baixar vídeo" title="Baixar vídeo">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg>
+      </a>
+    </nav>
+    <div class="play-invitation" id="play-invitation" hidden>
+      <span class="play-reflection" aria-hidden="true"></span>
+      <a class="play-cta" id="play-now" href="https://enade-ads-2026.vercel.app/" aria-label="Jogar agora — abrir ENADE ADS 2026">
+        <span class="cta-light-field" aria-hidden="true"></span>
+        <span class="sr-only">Jogar agora</span>
+        <span class="voxel-title" id="voxel-title" aria-hidden="true"></span>
+      </a>
+    </div>
+    <nav class="transport" aria-label="Reprodução da animação" hidden>
+      <button class="icon" id="play-toggle" type="button" aria-label="Pausar animação" title="Pausar animação">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path id="play-icon" d="M8 5v14M16 5v14"/></svg>
+      </button>
+      <input id="timeline" type="range" min="0" max="15.2" step="0.04" value="0" aria-label="Posição da animação">
+      <output id="playback-time" aria-live="off">0:00 / 0:15</output>
+      <button class="icon" id="captions" type="button" aria-label="Mostrar legendas" aria-pressed="false" title="Mostrar legendas"><span aria-hidden="true">CC</span></button>
+      <button class="icon" id="transport-fullscreen" type="button" aria-label="Entrar em tela cheia" title="Tela cheia (F)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg>
+      </button>
+    </nav>
+    <p class="status" id="status" role="status" hidden></p>
+  </main>
+  <script>
+    const stage = document.getElementById('stage');
+    const video = document.getElementById('opening');
+    const fullscreenButton = document.getElementById('fullscreen');
+    const fullscreenLabel = document.getElementById('fullscreen-label');
+    const status = document.getElementById('status');
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let idleTimer;
+
+    function message(text) { status.textContent=text;status.hidden=false; }
+    function wake() {
+      stage.classList.remove('idle');
+      clearTimeout(idleTimer);
+      if (!video.paused && !video.ended) idleTimer=setTimeout(() => stage.classList.add('idle'),2600);
+    }
+    function updateFullscreen() {
+      const active=Boolean(document.fullscreenElement || document.webkitFullscreenElement || video.webkitDisplayingFullscreen);
+      fullscreenLabel.textContent=active ? 'Sair da tela cheia' : 'Tela cheia';
+      fullscreenButton.setAttribute('aria-label',active ? 'Sair da tela cheia' : 'Entrar em tela cheia');
+      fullscreenButton.title=active ? 'Sair da tela cheia (Esc)' : 'Tela cheia (F)';
+      const transportFullscreen = document.getElementById('transport-fullscreen');
+      transportFullscreen.setAttribute('aria-label',active ? 'Sair da tela cheia' : 'Entrar em tela cheia');
+      transportFullscreen.title = fullscreenButton.title;
+      updateInvitation();
+      wake();
+    }
+    async function toggleFullscreen() {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else if (document.webkitFullscreenElement) document.webkitExitFullscreen();
+        else if (video.webkitDisplayingFullscreen && video.webkitExitFullscreen) video.webkitExitFullscreen();
+        else {
+          if (stage.requestFullscreen) await stage.requestFullscreen();
+          else if (stage.webkitRequestFullscreen) stage.webkitRequestFullscreen();
+          else {message('Use a opção de tela cheia do navegador.');return;}
+        }
+      } catch {message('Use o controle de tela cheia do vídeo ou a opção do navegador.');}
+      updateFullscreen();
+    }
+    fullscreenButton.addEventListener('click',toggleFullscreen);
+    document.getElementById('transport-fullscreen').addEventListener('click',toggleFullscreen);
+    document.getElementById('replay').addEventListener('click',restartVideo);
+    document.addEventListener('fullscreenchange',updateFullscreen);
+    document.addEventListener('webkitfullscreenchange',updateFullscreen);
+    video.addEventListener('webkitbeginfullscreen',updateFullscreen);
+    video.addEventListener('webkitendfullscreen',updateFullscreen);
+    stage.addEventListener('pointermove',wake,{passive:true});
+    stage.addEventListener('pointerdown',wake,{passive:true});
+    stage.addEventListener('focusin',wake);
+    for (const event of ['play','pause','ended']) video.addEventListener(event,wake);
+    video.addEventListener('error',() => message('Não foi possível carregar o vídeo. Atualize a página ou use Baixar vídeo.'));
+    document.addEventListener('keydown',event => {
+      wake();
+      if (!event.ctrlKey && !event.metaKey && !event.altKey && event.key.toLowerCase()==='f') {
+        event.preventDefault();toggleFullscreen();
+      }
+    });
+    motion.addEventListener('change',event => {if(event.matches)video.pause();});
+    // The CTA has its own clock; it cannot delay the approved video.
+    const invitation = document.getElementById('play-invitation');
+    const title = document.getElementById('voxel-title');
+    const glyphs = {
+      J:['00111','00010','00010','00010','10010','10010','01100'],
+      o:['00000','00000','01110','10001','10001','10001','01110'],
+      g:['00000','01111','10001','10001','01111','00001','01110'],
+      a:['00000','00000','01110','00001','01111','10001','01111'],
+      r:['00000','00000','10110','11001','10000','10000','10000']
+    };
+    let column = 0;
+    let letter = 0;
+    const cubes = document.createDocumentFragment();
+    const luminousPixels = [];
+    for (const character of 'Jogar agora') {
+      if (character === ' ') { column += 3; continue; }
+      glyphs[character].forEach((row,y) => [...row].forEach((pixel,x) => {
+        if (pixel !== '1') return;
+        luminousPixels.push(`<rect x="${column+x}" y="${y}" width=".9" height=".9"/>`);
+        const cube = document.createElement('span');
+        cube.className = 'play-cube';
+        cube.style.setProperty('--x',column+x);
+        cube.style.setProperty('--y',y);
+        cube.style.setProperty('--delay',`${letter*.105+((x*7+y*3)%9)*.009}s`);
+        cube.style.setProperty('--dx',`${(x-2)*14}px`);
+        cube.style.setProperty('--dy',`${(y-3)*-11-28}px`);
+        for (const face of ['cube-front','cube-top','cube-side']) {
+          const surface = document.createElement('span');
+          surface.className = `cube-face ${face}`;
+          cube.append(surface);
+        }
+        cubes.append(cube);
+      }));
+      column += 6;
+      letter++;
+    }
+    title.style.setProperty('--columns',column-1);
+    title.append(cubes);
+    // One mask illuminates all block faces without animating hundreds of paints.
+    const light = document.createElement('span');
+    light.className = 'voxel-light';
+    const lightMask = document.createElement('span');
+    lightMask.className = 'voxel-light-mask';
+    const maskSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${column-1} 7">${luminousPixels.join('')}</svg>`;
+    lightMask.style.setProperty('--letter-mask',`url("data:image/svg+xml,${encodeURIComponent(maskSvg)}")`);
+    light.append(lightMask);
+    title.append(light);
+    function updateInvitation() {
+      const show = video.readyState > 0 && video.currentTime >= Number(video.dataset.ctaStart);
+      if (invitation.hidden === !show) return;
+      invitation.hidden = !show;
+      invitation.classList.toggle('is-ready',show);
+    }
+    updateInvitation();
+
+    const transport = document.querySelector('.transport');
+    const playToggle = document.getElementById('play-toggle');
+    const playIcon = document.getElementById('play-icon');
+    const timeline = document.getElementById('timeline');
+    const playbackTime = document.getElementById('playback-time');
+    const captionsButton = document.getElementById('captions');
+    const videoSource = video.querySelector('source').src;
+    let localVideoUrl;
+    let localVideoPromise;
+    let seekingByControl = false;
+
+    function formatTime(seconds) {
+      const total = Math.floor(Number.isFinite(seconds) ? seconds : 0);
+      return `${Math.floor(total / 60)}:${String(total % 60).padStart(2,'0')}`;
+    }
+    function updatePlayback() {
+      const playing = !video.paused && !video.ended;
+      playToggle.setAttribute('aria-label',playing ? 'Pausar animação' : (video.ended ? 'Reproduzir do início' : 'Reproduzir animação'));
+      playToggle.title = playToggle.getAttribute('aria-label');
+      playIcon.setAttribute('d',playing ? 'M8 5v14M16 5v14' : 'M8 5l11 7-11 7Z');
+      if (Number.isFinite(video.duration)) timeline.max = video.duration;
+      if (!seekingByControl) timeline.value = video.currentTime;
+      playbackTime.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+      timeline.setAttribute('aria-valuetext',`${formatTime(video.currentTime)} de ${formatTime(video.duration)}`);
+      updateInvitation();
+    }
+    function canSeekVideo() {
+      return video.currentSrc.startsWith('blob:') || (video.seekable.length > 0 && video.seekable.end(video.seekable.length-1) > 0);
+    }
+    function prepareLocalVideo() {
+      if (!localVideoPromise) {
+        localVideoPromise = fetch(videoSource,{cache:'force-cache'})
+          .then(response => {if (!response.ok) throw new Error('Video unavailable');return response.blob();})
+          .then(blob => {localVideoUrl = URL.createObjectURL(blob);return localVideoUrl;})
+          .catch(error => {localVideoPromise = null;throw error;});
+      }
+      return localVideoPromise;
+    }
+    async function seekVideo(seconds, resume = !video.paused) {
+      seekingByControl = true;
+      video.pause();
+      try {
+        // A local Blob supports seeking when hosting does not serve byte ranges.
+        // It is adopted only on a user seek, so playback is never restarted by loading.
+        if (!canSeekVideo()) {
+          const url = await prepareLocalVideo();
+          await new Promise((resolve,reject) => {
+            video.addEventListener('loadedmetadata',resolve,{once:true});
+            video.addEventListener('error',reject,{once:true});
+            video.src = url;
+            video.load();
+          });
+        }
+        video.currentTime = Math.max(0,Math.min(seconds,video.duration));
+        updateInvitation();
+        if (resume) await video.play();
+      } catch {message('Não foi possível mudar a posição. Use Reproduzir do início para tentar novamente.');}
+      finally {seekingByControl = false;updatePlayback();wake();}
+    }
+    function restartVideo() {return seekVideo(0,true);}
+    function togglePlayback() {
+      if (video.ended) restartVideo();
+      else if (video.paused) video.play().catch(() => message('Use o botão de reprodução para iniciar.'));
+      else video.pause();
+    }
+    playToggle.addEventListener('click',togglePlayback);
+    video.addEventListener('click',togglePlayback);
+    timeline.addEventListener('change',() => seekVideo(Number(timeline.value)));
+    timeline.addEventListener('pointerdown',() => {seekingByControl = true;});
+    timeline.addEventListener('pointerup',() => {seekingByControl = false;});
+    captionsButton.addEventListener('click',() => {
+      const track = video.textTracks[0];
+      if (!track) return;
+      const show = track.mode !== 'showing';
+      track.mode = show ? 'showing' : 'disabled';
+      captionsButton.setAttribute('aria-pressed',String(show));
+      captionsButton.setAttribute('aria-label',show ? 'Ocultar legendas' : 'Mostrar legendas');
+      captionsButton.title = captionsButton.getAttribute('aria-label');
+    });
+    for (const event of ['loadedmetadata','timeupdate','play','pause','ended','seeking','seeked','emptied']) video.addEventListener(event,updatePlayback);
+    video.addEventListener('canplay',() => {if (!canSeekVideo()) prepareLocalVideo().catch(() => {});});
+    // Every visible fullscreen control now includes the video, CTA and controls.
+    video.controls = false;
+    transport.hidden = false;
+    updatePlayback();
+
+    if (!motion.matches) video.play().catch(() => {});
+  </script>
+</body>
+</html>
